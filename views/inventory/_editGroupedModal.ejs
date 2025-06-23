@@ -1,0 +1,55 @@
+<!-- Edit Modal -->
+<div class="modal fade" id="editGroupedModal-<%= entry.plantId %>-<%= entry.itemId %>">
+  <div class="modal-dialog">
+    <form action="/inventory/grouped-update" method="POST" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Inventory</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" name="plantId" value="<%= entry.plantId %>">
+        <input type="hidden" name="itemId" value="<%= entry.itemId %>">
+
+        <div class="mb-2">
+          <label class="form-label">Plant</label>
+          <input type="text" class="form-control" value="<%= entry.plantName %>" readonly>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Item Group</label>
+          <input type="text" class="form-control" value="<%= entry.itemGroupName %>" readonly>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Item</label>
+          <input type="text" class="form-control" value="<%= entry.itemName %>" readonly>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <label class="form-label">NEW</label>
+            <input type="number" class="form-control category-input" name="NEW" value="<%= entry.NEW %>" min="0" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">OLD</label>
+            <input type="number" class="form-control category-input" name="OLD" value="<%= entry.OLD %>" min="0" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">SCRAPED</label>
+            <input type="number" class="form-control category-input" name="SCRAPED" value="<%= entry.SCRAPED %>" min="0" required>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label class="form-label">Total</label>
+          <input type="number" class="form-control" id="total-<%= entry.plantId %>-<%= entry.itemId %>" value="<%= entry.NEW + entry.OLD + entry.SCRAPED %>" readonly>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Update</button>
+      </div>
+    </form>
+  </div>
+</div>

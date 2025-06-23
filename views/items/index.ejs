@@ -1,0 +1,124 @@
+<div class="container">
+    <h1 class="mb-4">Item List</h1>
+
+    <%- include('../partials/_flashMessages') %>
+
+
+        <!-- Add Item Button -->
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addItemModal">
+            + Add Item
+        </button>
+
+        <!-- Items Table -->
+        <div class="table-responsive rounded-3 shadow-sm">
+            <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Item Name</th>
+                    <th>Item Number</th>
+                    <th>UOM</th>
+                    <th>Group Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% items.forEach(item=> { %>
+                    <tr>
+                        <td>
+                            <%= item.id %>
+                        </td>
+                        <td>
+                            <%= item.itemName %>
+                        </td>
+                        <td>
+                            <%= item.itemNumber %>
+                        </td>
+                        <td>
+                            <%= item.uom %>
+                        </td>
+                        <td>
+                            <%= item.ItemGroup.groupName %>
+                        </td>
+                        <td>
+                            <button class="btn btn-warning btn-sm w-100" data-bs-toggle="modal"
+                                data-bs-target="#editItemModal-<%= item.id %>">
+                                Edit
+                            </button>
+
+                            <!-- Include Modal Partial -->
+                            <%- include('_editModal.ejs', { item, itemGroups }) %>
+                        </td>
+                    </tr>
+
+                    <% }) %>
+            </tbody>
+        </table>
+        </div>
+
+        <!-- (Next Step) Modal will go here -->
+        <!-- Placeholder for now -->
+        <div class="modal fade" id="addItemModal" tabindex="-1" aria-labelledby="addItemModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addItemModalLabel">Add New Item</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <% if (error && error.length> 0) { %>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <%= error %>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+                            </div>
+
+                            <% } %>
+
+                                <form action="/items" method="POST">
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="itemName" class="form-label">Item Name</label>
+                                            <input type="text" class="form-control" id="itemName" name="itemName"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="itemNumber" class="form-label">Item Number</label>
+                                            <input type="text" class="form-control" id="itemNumber" name="itemNumber"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="uom" class="form-label">UOM</label>
+                                            <input type="text" class="form-control" id="uom" name="uom" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="itemGroupId" class="form-label">Item Group</label>
+                                            <select class="form-select" id="itemGroupId" name="itemGroupId" required>
+                                                <% itemGroups.forEach(group=> { %>
+                                                    <option value="<%= group.id %>">
+                                                        <%= group.groupName %>
+                                                    </option>
+                                                    <% }) %>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Add Item</button>
+                                    </div>
+                                </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+</div>
+
+<% if (error && error.length> 0) { %>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const myModal = new bootstrap.Modal(document.getElementById('addItemModal'));
+            myModal.show();
+        });
+    </script>
+    <% } %>

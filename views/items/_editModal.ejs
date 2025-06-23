@@ -1,0 +1,48 @@
+<!-- Edit Item Modal -->
+<div class="modal fade" id="editItemModal-<%= item.id %>" tabindex="-1"
+    aria-labelledby="editItemModalLabel-<%= item.id %>" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="/items/<%= item.id %>/update" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editItemModalLabel-<%= item.id %>">Edit Item - <%= item.itemName %>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Item Name</label>
+                        <input type="text" class="form-control" name="itemName" value="<%= item.itemName %>" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Item Number</label>
+                        <input type="text" class="form-control" name="itemNumber" value="<%= item.itemNumber %>"
+                            required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">UOM</label>
+                        <input type="text" class="form-control" name="uom" value="<%= item.uom %>" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Item Group</label>
+                        <select class="form-select" name="itemGroupId" required>
+                            <% itemGroups.forEach(group=> { %>
+                                <option value="<%= group.id %>" <%=group.id===item.ItemGroup.id ? 'selected' : '' %>>
+                                    <%= group.groupName %>
+                                </option>
+                                <% }) %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

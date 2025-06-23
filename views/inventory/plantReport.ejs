@@ -1,0 +1,68 @@
+<div class="container">
+  <h1 class="mb-4">Plant-wise Inventory Report</h1>
+  <a href="/inventory/plants/export" class="btn btn-outline-success mb-3">
+    Export Entire Plant-Wise Report
+  </a>
+
+  <div class="accordion" id="plantAccordion">
+    <% let plantIndex=0; %>
+      <% for (const plantName in structuredInventory) { const groupData=structuredInventory[plantName]; %>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="heading-<%= plantIndex %>">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+              data-bs-target="#collapse-<%= plantIndex %>" aria-expanded="false">
+              <%= plantName %>
+            </button>
+          </h2>
+          <div id="collapse-<%= plantIndex %>" class="accordion-collapse collapse" data-bs-parent="#plantAccordion">
+            <div class="accordion-body">
+
+              <% for (const groupName in groupData) { const itemData=groupData[groupName]; %>
+                <h5 class="mt-3 text-dark">
+                  <%= groupName %>
+                </h5>
+                <div class="table-responsive">
+                  <table class="table table-bordered">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Item</th>
+                        <th>NEW</th>
+                        <th>OLD</th>
+                        <th>SCRAPED</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% for (const itemName in itemData) { const item=itemData[itemName]; %>
+                        <tr>
+                          <td>
+                            <%= itemName %>
+                          </td>
+                          <td>
+                            <%= item.NEW %>
+                          </td>
+                          <td>
+                            <%= item.OLD %>
+                          </td>
+                          <td>
+                            <%= item.SCRAPED %>
+                          </td>
+                          <td>
+                            <%= item.total %>
+                          </td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                  </table>
+
+
+                </div>
+                <% } %>
+
+            </div>
+          </div>
+        </div>
+        <% plantIndex++; %>
+          <% } %>
+  </div>
+</div>

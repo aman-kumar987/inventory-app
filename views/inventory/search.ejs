@@ -1,0 +1,132 @@
+<div class="container">
+    <%- include('../partials/_flashMessages') %>
+        <h1 class="mb-4">Search Item in Plants</h1>
+
+        <form method="GET" action="/inventory/search" class="row g-2 mb-5">
+            <div class="col-md-4">
+                <select id="itemGroup" class="form-select">
+                    <option value="">-- Select Item Group --</option>
+                    <% itemGroups.forEach(group=> { %>
+                        <option value="<%= group.id %>">
+                            <%= group.groupName %>
+                        </option>
+                        <% }) %>
+                </select>
+            </div>
+
+            <div class="col-md-4 position-relative">
+                <input type="text" id="itemSearch" name="q" class="form-control" placeholder="Start typing item name..."
+                    autocomplete="off">
+                <div id="suggestions" class="list-group position-absolute w-100"></div>
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-primary" type="submit">Search</button>
+            </div>
+        </form>
+
+        <% if (groupedByPlant && Object.keys(groupedByPlant).length===0) { %>
+            <div class="alert alert-warning">No matching items found.</div>
+            <% } %>
+
+                <% if (groupedByPlant) { %>
+                    <h5 class="mb-3 fs-6">Showing results for "<%= query %>"</h5>
+                    <div class="table-responsive rounded-3 shadow-sm">
+                        <table class="table table-bordered table-hover">
+                        <thead class="table-dark text-center">
+                            <tr>
+                                <th>Plant</th>
+                                <th>NEW</th>
+                                <th>OLD</th>
+                                <th>SCRAPED</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            <% for (const plant in groupedByPlant) { const data=groupedByPlant[plant]; %>
+                                <tr>
+                                    <td class="text-start">
+                                        <%= plant %>
+                                    </td>
+                                    <td>
+                                        <%= data.NEW %>
+                                    </td>
+                                    <td>
+                                        <%= data.OLD %>
+                                    </td>
+                                    <td>
+                                        <%= data.SCRAPED %>
+                                    </td>
+                                    <td><strong>
+                                            <%= data.total %>
+                                        </strong></td>
+                                </tr>
+                                <% } %>
+                        </tbody>
+                        <tfoot class="table-secondary fw-bold text-center">
+                            <tr>
+                                <td>Total</td>
+                                <td>
+                                    <%= totalSummary.NEW %>
+                                </td>
+                                <td>
+                                    <%= totalSummary.OLD %>
+                                </td>
+                                <td>
+                                    <%= totalSummary.SCRAPED %>
+                                </td>
+                                <td>
+                                    <%= totalSummary.total %>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    </div>
+                    <% } %>
+
+
+</div>
+
+<script>
+    const input = document.getElementById("itemSearch");
+    const suggestionsBox = document.getElementById("suggestions");
+    const groupDropdown = document.getElementById("itemGroup");
+
+    input.addEventListener("input", async () => {
+        const query = input.value.trim();
+        const groupId = groupDropdown.value;
+
+        if (query.length < 1) {
+            suggestionsBox.innerHTML = "";
+            return;
+        }
+
+        try {
+            const res = await fetch(`/api/inventory/items?q=${query}&groupId=${groupId}`, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            const items = await res.json();
+
+            suggestionsBox.innerHTML = "";
+            items.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "list-group-item list-group-item-action";
+                div.textContent = item.itemName;
+                div.onclick = () => {
+                    input.value = item.itemName;
+                    suggestionsBox.innerHTML = "";
+                };
+                suggestionsBox.appendChild(div);
+            });
+        } catch (err) {
+            console.error("Error fetching suggestions", err);
+        }
+    });
+
+    document.addEventListener("click", () => {
+        suggestionsBox.innerHTML = ""; // hide on outside click
+    });
+</script>

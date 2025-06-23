@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Inventory {
+  id       Int          @id @default(autoincrement())
+  plantId  Int
+  itemId   Int
+  quantity Int?         @default(1)
+  category itemCategory
+  Item     Item         @relation(fields: [itemId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_inventory_item")
+  Plant    Plant        @relation(fields: [plantId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_inventory_plant")
+}
+
+model Item {
+  id          Int         @id @default(autoincrement())
+  itemNumber  String      @unique @db.VarChar(100)
+  itemName    String      @unique @db.VarChar(255)
+  uom         String      @db.VarChar(20)
+  itemGroupId Int
+  Inventory   Inventory[]
+  ItemGroup   ItemGroup   @relation(fields: [itemGroupId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_item_group")
+}
+
+model ItemGroup {
+  id        Int    @id @default(autoincrement())
+  groupName String @unique @db.VarChar(255)
+  Item      Item[]
+}
+
+model Plant {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique @db.VarChar(255)
+  Inventory Inventory[]
+}
+
+enum itemCategory {
+  NEW
+  OLD
+  SCRAPED
+}

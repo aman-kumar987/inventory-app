@@ -1,0 +1,162 @@
+<div class="container">
+    <h1 class="mb-4">Inventory Summary</h1>
+
+    <%- include('../partials/_flashMessages') %>
+
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addInventoryModal">
+            + Add Item
+        </button>
+
+        <a href="/inventory/export" class="btn btn-outline-success mb-3 mx-3">
+            Export to Excel
+        </a>
+
+        <div class="table-responsive rounded-3 shadow-sm">
+            <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Sr. No.</th>
+                    <th>Plant</th>
+                    <th>Item Group</th>
+                    <th>Item</th>
+                    <th>New</th>
+                    <th>Old</th>
+                    <th>Scraped</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% inventory.forEach((entry, index)=> { %>
+                    <tr>
+                        <td>
+                            <%= index + 1 %>
+                        </td>
+                        <td>
+                            <%= entry.plantName %>
+                        </td>
+                        <td>
+                            <%= entry.itemGroupName %>
+                        </td>
+                        <td>
+                            <%= entry.itemName %>
+                        </td>
+                        <td>
+                            <%= entry.NEW %>
+                        </td>
+                        <td>
+                            <%= entry.OLD %>
+                        </td>
+                        <td>
+                            <%= entry.SCRAPED %>
+                        </td>
+                        <td>
+                            <%= entry.NEW + entry.OLD + entry.SCRAPED %>
+                        </td>
+                        <td>
+                            <button class="btn btn-warning btn-sm w-100" data-bs-toggle="modal"
+                                data-bs-target="#editGroupedModal-<%= entry.plantId %>-<%= entry.itemId %>">
+                                Edit
+                            </button>
+
+                            <%- include('_editGroupedModal.ejs', { entry }) %>
+                        </td>
+
+                    </tr>
+                    <% }) %>
+            </tbody>
+
+
+        </table>
+        </div>
+</div>
+
+<div class="modal fade" id="addInventoryModal" tabindex="-1" aria-labelledby="addInventoryModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="/inventory" method="POST" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addInventoryModalLabel">Add Inventory</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Plant</label>
+                    <select name="plantId" class="form-select" required>
+                        <option value="">Select Plant</option>
+                        <% plants.forEach(plant=> { %>
+                            <option value="<%= plant.id %>">
+                                <%= plant.name %>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Item</label>
+                    <select name="itemId" class="form-select" required>
+                        <option value="">Select Item</option>
+                        <% items.forEach(item=> { %>
+                            <option value="<%= item.id %>">
+                                <%= item.itemName %>
+                            </option>
+                            <% }) %>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Category</label>
+                    <select name="category" class="form-select" required>
+                        <option value="">Select Category</option>
+                        <option value="NEW">NEW</option>
+                        <option value="OLD">OLD</option>
+                        <option value="SCRAPED">SCRAPED</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Quantity</label>
+                    <input type="number" name="quantity" class="form-control" min="1" required>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-success" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.querySelectorAll('.category-input').forEach(input => {
+        input.addEventListener('input', function () {
+            const form = input.closest('form');
+            const newVal = parseInt(form.querySelector('[name="NEW"]').value) || 0;
+            const oldVal = parseInt(form.querySelector('[name="OLD"]').value) || 0;
+            const scrapedVal = parseInt(form.querySelector('[name="SCRAPED"]').value) || 0;
+            const totalField = form.querySelector('input[id^="total"]');
+            totalField.value = newVal + oldVal + scrapedVal;
+        });
+    });
+</script>
+<script>
+    document.querySelectorAll('.modal').forEach(modal => {
+        const inputs = modal.querySelectorAll('.category-input');
+        const totalField = modal.querySelector('input[id^="total-"]');
+
+        const updateTotal = () => {
+            const total = Array.from(inputs).reduce((sum, input) => {
+                const val = parseInt(input.value);
+                return sum + (isNaN(val) ? 0 : val);
+            }, 0);
+            totalField.value = total;
+        };
+
+        inputs.forEach(input => {
+            input.addEventListener('input', updateTotal);
+        });
+    });
+</script>
